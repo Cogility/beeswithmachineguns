@@ -238,6 +238,8 @@ def report():
     Report the status of the load testing servers.
     """
     username, key_name, zone, instance_ids = _read_server_list()
+    
+    print('Username %s, Key File Name %s, Zone %s' % (username, key_name, zone))
 
     if not instance_ids:
         print('No bees have been mobilized.')
@@ -346,6 +348,9 @@ def _attack(params):
             scpCommand = "scp -q -o 'StrictHostKeyChecking=no' -i %s %s %s@%s:~/" % (pem_file_path, params['post_file'], params['username'], params['instance_name'])
             os.system(scpCommand)
             options += ' -p ~/%s' % params['post_file']
+
+	if params['api']:
+	    options += ' -T application/json'
 
         if params['keep_alive']:
             options += ' -k'
@@ -599,6 +604,7 @@ def attack(url, n, c, **options):
     csv_filename = options.get("csv_filename", '')
     cookies = options.get('cookies', '')
     post_file = options.get('post_file', '')
+    api = options.get('api', '')
     keep_alive = options.get('keep_alive', False)
     basic_auth = options.get('basic_auth', '')
 
@@ -658,6 +664,7 @@ def attack(url, n, c, **options):
             'contenttype': contenttype,
             'cookies': cookies,
             'post_file': options.get('post_file'),
+	    'api': options.get('api'),
             'keep_alive': options.get('keep_alive'),
             'mime_type': options.get('mime_type', ''),
             'tpr': options.get('tpr'),
@@ -697,6 +704,9 @@ def attack(url, n, c, **options):
     if contenttype is not '':
         request.add_header("Content-Type", contenttype)
 
+    if api is not '': 
+	request.add_header("Content-Type", "application/json")
+
     for key, value in dict_headers.items():
         request.add_header(key, value)
 
@@ -704,8 +714,16 @@ def attack(url, n, c, **options):
         context = ssl._create_unverified_context()
         response = urlopen(request, context=context)
     else:
-        response = urlopen(request)
+	try:
+		print vars(post_file)
+		print vars(request)
+        	response = urlopen(request)
+	except IOError:
+		print('bees: couldn\'t open the URL provided.')
+		print vars(request)
+		return
 
+    print vars(request)
     response.read()
 
     print('Organizing the swarm.')

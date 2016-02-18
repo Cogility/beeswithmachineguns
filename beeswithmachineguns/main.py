@@ -95,6 +95,9 @@ commands:
     attack_group.add_option('-K', '--keepalive', metavar="KEEP_ALIVE", nargs=0,
                             action='store', dest='keep_alive', type='string', default=False,
                             help="Keep-Alive connection.")
+    attack_group.add_option('-a', '--api', metavar="API", nargs=1,
+			    action='store', dest='api', type='string', default=False,
+			    help="Tests an API call as opposed to normal operations.")
     attack_group.add_option('-p', '--post-file',  metavar="POST_FILE",  nargs=1,
                             action='store', dest='post_file', type='string', default=False,
                             help="The POST file to deliver with the bee's payload.")
@@ -155,6 +158,7 @@ commands:
             cookies=options.cookies,
             headers=options.headers,
             post_file=options.post_file,
+	    api=options.api,
             keep_alive=options.keep_alive,
             mime_type=options.mime_type,
             csv_filename=options.csv_filename,
