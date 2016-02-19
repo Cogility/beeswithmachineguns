@@ -349,7 +349,7 @@ def _attack(params):
             os.system(scpCommand)
             options += ' -p ~/%s' % params['post_file']
 
-	if params['api']:
+	if params['add_api']:
 	    options += ' -T application/json'
 
         if params['keep_alive']:
@@ -604,7 +604,7 @@ def attack(url, n, c, **options):
     csv_filename = options.get("csv_filename", '')
     cookies = options.get('cookies', '')
     post_file = options.get('post_file', '')
-    api = options.get('api', '')
+    add_api = options.get('add_api', False)
     keep_alive = options.get('keep_alive', False)
     basic_auth = options.get('basic_auth', '')
 
@@ -664,7 +664,7 @@ def attack(url, n, c, **options):
             'contenttype': contenttype,
             'cookies': cookies,
             'post_file': options.get('post_file'),
-	    'api': options.get('api'),
+	    'add_api': options.get('add_api'),
             'keep_alive': options.get('keep_alive'),
             'mime_type': options.get('mime_type', ''),
             'tpr': options.get('tpr'),
@@ -679,6 +679,7 @@ def attack(url, n, c, **options):
     if post_file:
         try:
             with open(post_file, 'r') as content_file:
+		print('Adding post file...')
                 content = content_file.read()
             if IS_PY2:
                 request.add_data(content)
@@ -704,7 +705,7 @@ def attack(url, n, c, **options):
     if contenttype is not '':
         request.add_header("Content-Type", contenttype)
 
-    if api is not '': 
+    if add_api is not '': 
 	request.add_header("Content-Type", "application/json")
 
     for key, value in dict_headers.items():
@@ -715,15 +716,11 @@ def attack(url, n, c, **options):
         response = urlopen(request, context=context)
     else:
 	try:
-		print vars(post_file)
-		print vars(request)
         	response = urlopen(request)
 	except IOError:
 		print('bees: couldn\'t open the URL provided.')
-		print vars(request)
 		return
 
-    print vars(request)
     response.read()
 
     print('Organizing the swarm.')
@@ -731,6 +728,7 @@ def attack(url, n, c, **options):
     pool = Pool(len(params))
     results = pool.map(_attack, params)
 
+    print(params)
     summarized_results = _summarize_results(results, params, csv_filename)
     print('Offensive complete.')
     _print_results(summarized_results)
