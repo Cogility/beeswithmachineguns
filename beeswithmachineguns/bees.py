@@ -728,7 +728,6 @@ def attack(url, n, c, **options):
     pool = Pool(len(params))
     results = pool.map(_attack, params)
 
-    print(params)
     summarized_results = _summarize_results(results, params, csv_filename)
     print('Offensive complete.')
     _print_results(summarized_results)
