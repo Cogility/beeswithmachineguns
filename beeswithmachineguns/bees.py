@@ -366,7 +366,8 @@ def _attack(params):
 
         params['options'] = options
         # benchmark_command = 'ab -v 3 -r -n %(num_requests)s -c %(concurrent_requests)s %(options)s "%(url)s"' % params
-	benchmark_command = 'jmeter -n -t /opt/cogility/CEA_Login_and_Search_update01.jmx -Jhost=%(url)s" 
+	num_of_loops = num_requests/concurrent_requests;
+	benchmark_command = 'jmeter -n -t $(post_file)s -Jhost=%(url)s -Jthreads=$(concurrent_requests)s -Jloops=%(num_of_loops)s' 
         # print(benchmark_command)
         stdin, stdout, stderr = client.exec_command(benchmark_command)
 
