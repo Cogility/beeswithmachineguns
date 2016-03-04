@@ -348,6 +348,7 @@ def _attack(params):
             scpCommand = "scp -q -o 'StrictHostKeyChecking=no' -i %s %s %s@%s:~/" % (pem_file_path, params['post_file'], params['username'], params['instance_name'])
             os.system(scpCommand)
             options += ' -p ~/%s' % params['post_file']
+	    options += ' -T application/json'
 
 	if params['add_api']:
 	    options += ' -T application/json'
@@ -364,8 +365,9 @@ def _attack(params):
             options += ' -A %s' % params['basic_auth']
 
         params['options'] = options
-        benchmark_command = 'ab -v 3 -r -n %(num_requests)s -c %(concurrent_requests)s %(options)s "%(url)s"' % params
-        #print(benchmark_command)
+        # benchmark_command = 'ab -v 3 -r -n %(num_requests)s -c %(concurrent_requests)s %(options)s "%(url)s"' % params
+	benchmark_command = 'jmeter -n -t /opt/cogility/CEA_Login_and_Search_update01.jmx -Jhost=%(url)s" 
+        # print(benchmark_command)
         stdin, stdout, stderr = client.exec_command(benchmark_command)
 
         response = {}
